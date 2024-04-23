@@ -1,4 +1,3 @@
-// Import required modules
 const mysql = require('mysql');
 const readline = require('readline');
 
@@ -8,16 +7,16 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-// Serve static files from the 'public' directory
+// Use static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Define a route to handle requests to the root URL
+// Route for requests to URL
 app.get('/', (req, res) => {
    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 
-// Create MySQL connection
+// Establish MySQL connection
 const connection = mysql.createConnection({
     host: 'localhost', // MySQL host
     user: 'root', // MySQL username
@@ -25,13 +24,13 @@ const connection = mysql.createConnection({
     database: 'Pepperdine_Database' // MySQL database name
 });
 
-// Create readline interface for user input
+// Create interface for user input
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-// Connect to MySQL database
+// Connect to MySQL
 connection.connect((err) => {
     if (err) throw err;
     console.log('Connected to MySQL database');
@@ -52,19 +51,19 @@ connection.connect((err) => {
                 coursePlan.push(row);
             });
 
-            // Calculate remaining credits for GE
+            // Calculate remaining credits for GEs
             const remainingCredits = 128 - totalCredits;
 
-            // Query database for GE courses
+            // Query database for GEs
             connection.query(`SELECT COURSE_ID, COURSE_TITLE, COURSE_CREDITS
                               FROM Courses WHERE IS_GE = 'Y' ORDER BY COURSE_ID LIMIT ${remainingCredits}`, (err, geResults) => {
                 if (err) throw err;
-                // Add GE courses to course plan
+                // Add GEs to plan
                 geResults.forEach(row => {
                     coursePlan.push(row);
                 });
 
-                // Output four-year course plan
+                // Output plan
                 console.log(`Course plan for ${input}:`);
                 const years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
                 let yearIndex = 0;
@@ -89,10 +88,10 @@ connection.connect((err) => {
 });
 
 app.get('/course-plan', (req, res) => {
-    // Retrieve the major/minor from the query parameters
+    // Retrieve the major/minor from query
     const majorMinor = req.query.majorMinor;
 
-    // Query the database for the course plan based on the major/minor
+    // Query database for course plan
     connection.query(`
         SELECT c.COURSE_ID, c.COURSE_TITLE
         FROM Courses c
@@ -105,12 +104,12 @@ app.get('/course-plan', (req, res) => {
             return;
         }
 
-        // Send the generated course plan as a JSON response
+        // Send generated course plan
         res.json({ coursePlan: results });
     });
 });
 
-// Start the server
+// Start server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
