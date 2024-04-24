@@ -1,54 +1,54 @@
 function generatePlan() {
-  // Retrieve the value of the input field where users enter their major/minor
+  // Retrieve major/minor from user input
   const majorMinor = document.getElementById('major-minor').value;
 
-  // Make a fetch request to the backend endpoint to generate the course plan
+  // Make fetch request to backend to generate course plan
   fetch(`/course-plan?majorMinor=${encodeURIComponent(majorMinor)}`)
       .then(response => {
-          // Check if the fetch request was successful (status code 200)
+          // Check if fetch was successful
           if (!response.ok) {
               throw new Error('Network response was not ok');
           }
-          // Parse the JSON response
+          // Parse response
           return response.json();
       })
       .then(data => {
-          // Access the course plan data from the response
+          // Access course plan data from response
           const coursePlanDiv = document.getElementById('course-plan');
           coursePlanDiv.innerHTML = ''; // Clear previous content
 
-          // Check if the response contains an error message
+          // Check if response contains error message
           if (data.error) {
               coursePlanDiv.textContent = data.error; // Display error message
           } else {
               const coursePlan = data.coursePlan;
 
-              // Calculate the number of courses per year
+              // Calculate number of courses per year
               const coursesPerYear = Math.ceil(coursePlan.length / 4);
 
-              // Initialize variables to keep track of the displayed year title
+              // Initialize variables for displayed year title
               let currentYearIndex = -1;
               let yearTitleDisplayed = false;
 
-              // Loop through the course plan data and display each course
+              // Loop through course plan and display each course
               for (let i = 0; i < coursePlan.length; i++) {
-                  // Calculate the year index based on the current index and courses per year
+                  // Calculate year index based on the current index and courses per year
                   const yearIndex = Math.floor(i / coursesPerYear);
 
-                  // Check if we need to display the year title for the current year group
+                  // Check if need to display the year title for the current year group
                   if (yearIndex !== currentYearIndex) {
-                      // Display the year title only once per year group
+                      // Display year title only once per year group 
                       currentYearIndex = yearIndex;
                       yearTitleDisplayed = false;
                   }
 
-                  // Display the year title if it hasn't been displayed yet for the current year group
+                  // Display year title if not displayed for current year group
                   if (!yearTitleDisplayed) {
                       coursePlanDiv.innerHTML += `<h2>${getYearName(yearIndex)}:</h2>`;
                       yearTitleDisplayed = true;
                   }
 
-                  // Append the course information to the coursePlanDiv
+                  // Append course information
                   coursePlanDiv.innerHTML += `<p>- ${coursePlan[i].COURSE_ID}: ${coursePlan[i].COURSE_TITLE}</p>`;
               }
           }
@@ -56,16 +56,13 @@ function generatePlan() {
       .catch(error => {
           // Handle fetch errors
           console.error('Fetch error:', error);
-          // Display an error message on the webpage
+          // Display an error message on webpage
           document.getElementById('course-plan').textContent = 'An error occurred while generating the course plan. Please try again later.';
       });
 }
 
-// Function to get the year name based on the year index
 function getYearName(yearIndex) {
-  // Define year names (customize as needed)
   const yearNames = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
-  // Return the year name corresponding to the year index
   return yearNames[yearIndex] || 'Other';
 }
 
@@ -97,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
           coursePlanOutput.appendChild(courseItem);
         });
       } catch (error) {
+        // Display error message
         console.error('An error occurred:', error.message);
-        // Display an error message to the user
       }
     });
   });
